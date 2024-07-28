@@ -17,15 +17,8 @@ def get_image_description(api_key_json, image_content):
     image = vision.Image(content=image_content)
     response = client.label_detection(image=image)
     labels = response.label_annotations
-    return labels
-
-# Function to create a natural language description from labels
-def create_natural_description(labels):
-    if not labels:
-        return "No description available."
-
-    descriptions = [label.description for label in labels]
-    return f"This image likely contains: {', '.join(descriptions[:-1])}, and {descriptions[-1]}."
+    description = ', '.join([label.description for label in labels])
+    return description
 
 # Streamlit app
 st.title('Image Description with Google Vision API')
@@ -46,11 +39,9 @@ if uploaded_file and image_url:
         st.image(image, caption='Uploaded Image.', use_column_width=True)
         
         image_content = BytesIO(response.content).getvalue()
-        labels = get_image_description(api_key_json, image_content)
-        description = create_natural_description(labels)
+        description = get_image_description(api_key_json, image_content)
         st.write('Description:', description)
     except UnidentifiedImageError:
         st.error("Error loading image: cannot identify image file.")
     except Exception as e:
         st.error(f"Error: {e}")
-
