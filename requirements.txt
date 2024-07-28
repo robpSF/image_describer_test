@@ -2,4 +2,4 @@ streamlit
 Pillow
 requests
 openai
-google-cloud-vision==3.0.2
+google-cloud-vision
