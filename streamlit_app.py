@@ -1,38 +1,40 @@
 import streamlit as st
 from PIL import Image, UnidentifiedImageError
 import requests
-import openai
 from io import BytesIO
+from google.cloud import vision
+import os
 
-# Streamlit app
-st.title('Image Description with OpenAI Image Model')
-st.write('Enter your OpenAI API key and the URL of an image to get a description.')
-
-# Input fields for API key and image URL
-api_key = st.text_input('Enter your OpenAI API Key', type='password')
-image_url = st.text_input('Enter Image URL')
+# Set up Google Cloud Vision client
+def get_vision_client():
+    return vision.ImageAnnotatorClient()
 
 # Function to get image description
-def get_image_description(api_key, image_url):
-    openai.api_key = api_key
-    response = openai.Image.create(
-        prompt=f"Describe the image at this URL: {image_url}",
-        n=1,
-        size="1024x1024"
-    )
-    return response
+def get_image_description(image_content):
+    client = get_vision_client()
+    image = vision.Image(content=image_content)
+    response = client.label_detection(image=image)
+    labels = response.label_annotations
+    description = ', '.join([label.description for label in labels])
+    return description
+
+# Streamlit app
+st.title('Image Description with Google Vision API')
+st.write('Enter the URL of an image to get a description.')
+
+# Input field for image URL
+image_url = st.text_input('Enter Image URL')
 
 # Display the image and description
-if api_key and image_url:
+if image_url:
     try:
         response = requests.get(image_url)
         image = Image.open(BytesIO(response.content))
         st.image(image, caption='Uploaded Image.', use_column_width=True)
         
-        response = get_image_description(api_key, image_url)
-        description = response['data'][0]['text']
+        image_content = BytesIO(response.content).getvalue()
+        description = get_image_description(image_content)
         st.write('Description:', description)
-        st.write('Full Response:', response)  # Print the full response for debugging
     except UnidentifiedImageError:
         st.error("Error loading image: cannot identify image file.")
     except Exception as e:
