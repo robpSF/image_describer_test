@@ -13,15 +13,14 @@ api_key = st.text_input('Enter your OpenAI API Key', type='password')
 image_url = st.text_input('Enter Image URL')
 
 # Function to get image description
-def get_image_description(api_key, image):
+def get_image_description(api_key, image_description_prompt):
     openai.api_key = api_key
-    response = openai.Image.create(
-        prompt=f"Describe the image.",
-        n=1,
-        size="1024x1024",
-        image=image
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=image_description_prompt,
+        max_tokens=100
     )
-    return response['data'][0]['text']
+    return response.choices[0].text.strip()
 
 # Display the image and description
 if api_key and image_url:
@@ -29,8 +28,11 @@ if api_key and image_url:
         response = requests.get(image_url)
         image = Image.open(BytesIO(response.content))
         st.image(image, caption='Uploaded Image.', use_column_width=True)
-
-        description = get_image_description(api_key, response.content)
+        
+        # Creating a prompt for the GPT model
+        image_description_prompt = f"Describe the following image: {image_url}"
+        
+        description = get_image_description(api_key, image_description_prompt)
         st.write('Description:', description)
     except UnidentifiedImageError:
         st.error("Error loading image: cannot identify image file.")
