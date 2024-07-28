@@ -22,7 +22,7 @@ def get_image_description(api_key, image_url):
             {"role": "user", "content": f"Describe the following image: {image_url}"}
         ],
     )
-    return response.choices[0].message['content']
+    return response
 
 # Display the image and description
 if api_key and image_url:
@@ -31,9 +31,12 @@ if api_key and image_url:
         image = Image.open(BytesIO(response.content))
         st.image(image, caption='Uploaded Image.', use_column_width=True)
         
-        description = get_image_description(api_key, image_url)
+        response = get_image_description(api_key, image_url)
+        description = response.choices[0].message['content']
         st.write('Description:', description)
+        st.write('Full Response:', response)  # Print the full response for debugging
     except UnidentifiedImageError:
         st.error("Error loading image: cannot identify image file.")
     except Exception as e:
         st.error(f"Error: {e}")
+
