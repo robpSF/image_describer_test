@@ -4,6 +4,7 @@ import requests
 from io import BytesIO
 from google.cloud import vision
 from google.oauth2 import service_account
+import json
 
 # Function to get Google Vision client
 def get_vision_client(api_key_json):
@@ -21,18 +22,18 @@ def get_image_description(api_key_json, image_content):
 
 # Streamlit app
 st.title('Image Description with Google Vision API')
-st.write('Enter your Google Cloud Vision API key (JSON) and the URL of an image to get a description.')
+st.write('Upload your Google Cloud Vision API key (JSON) and the URL of an image to get a description.')
 
-# Input field for API key
-api_key = st.text_area('Enter your Google Cloud Vision API Key (JSON)', height=200)
+# Input field for API key JSON file
+uploaded_file = st.file_uploader("Upload JSON key file", type="json")
 
 # Input field for image URL
 image_url = st.text_input('Enter Image URL')
 
 # Display the image and description
-if api_key and image_url:
+if uploaded_file and image_url:
     try:
-        api_key_json = st.json.loads(api_key)
+        api_key_json = json.load(uploaded_file)
         response = requests.get(image_url)
         image = Image.open(BytesIO(response.content))
         st.image(image, caption='Uploaded Image.', use_column_width=True)
