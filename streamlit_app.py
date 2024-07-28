@@ -16,7 +16,7 @@ image_url = st.text_input('Enter Image URL')
 def get_image_description(api_key, image_description_prompt):
     openai.api_key = api_key
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-4o-mini",
         prompt=image_description_prompt,
         max_tokens=100
     )
