@@ -35,7 +35,7 @@ def infer_personality_and_write_bio(api_key, elements):
     prompt += '[""]'
     
     response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
