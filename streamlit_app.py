@@ -40,7 +40,7 @@ def infer_personality_and_write_bio(api_key, elements):
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=150
+        max_tokens=250
     )
     return response.choices[0].message['content']
 
