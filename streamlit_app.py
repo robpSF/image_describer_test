@@ -29,13 +29,13 @@ def infer_personality_and_write_bio(api_key, elements):
     prompt += "##STEP 2\n"
     prompt += "Write their twitter bio. \n\n"
     prompt += "##STEP 3\n"
-    prompt += "Write an instagram post based on these image elememts:" + elements +"\n\n"
+    prompt += "Write an instagram post based on the elememts. \n"
     prompt += "##RULES\n"
     prompt += "1. Don't use emojis\n"
     prompt += "2. Do NOT directly mention what's labelled, work from the personality\n\n"
     
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
