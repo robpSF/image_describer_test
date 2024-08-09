@@ -7,6 +7,10 @@ from google.oauth2 import service_account
 import openai
 import json
 
+password = sl.text_input("Enter a password", type="password")
+if password != sl.secrets["password"]:
+    exit("it's all over")
+
 # Function to get Google Vision client
 def get_vision_client(api_key_json):
     credentials = service_account.Credentials.from_service_account_info(api_key_json)
