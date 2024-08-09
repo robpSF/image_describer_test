@@ -57,7 +57,7 @@ def generate_message_for_csv(api_key, elements):
     prompt = f"The image contains the following elements: {elements}. Write a 20 word message that could be used in a social media post. Don't encapsule the output in quotes"
     
     response = openai.ChatCompletion.create(
-        model="gpt-4o",
+        model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
@@ -109,6 +109,10 @@ elif mode == "CSV Mode":
             if "Message" not in df.columns or "Attachment" not in df.columns:
                 st.error("CSV must contain 'Message' and 'Attachment' columns.")
             else:
+                # Progress bar
+                progress_bar = st.progress(0)
+                total_rows = len(df)
+                
                 # Loop through each row in the CSV
                 for idx, row in df.iterrows():
                     image_url = row['Attachment']
@@ -120,6 +124,9 @@ elif mode == "CSV Mode":
                         df.at[idx, 'Message'] = message
                     except Exception as e:
                         st.warning(f"Error processing row {idx}: {e}")
+                    
+                    # Update the progress bar
+                    progress_bar.progress((idx + 1) / total_rows)
                 
                 st.write("CSV Processing Complete. Download the updated CSV below.")
                 
