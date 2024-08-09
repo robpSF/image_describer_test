@@ -46,30 +46,46 @@ def infer_personality_and_write_bio(api_key, elements):
 
 # Streamlit app
 st.title('Image Analysis and Twitter Bio Generation')
-st.write('Upload the URL of an image to analyze and generate a Twitter bio.')
+st.write('Upload an image or provide the URL of an image to analyze and generate a Twitter bio.')
 
 # Retrieve secrets from Streamlit
 google_api_key_json = json.loads(st.secrets["json_key"])
-#st.write("Raw JSON string from secrets:", google_api_key_json)
 openai_api_key = st.secrets["api_key"]
 
-# Input field for image URL
-image_url = st.text_input('Enter Image URL')
+# Option to upload an image or provide a URL
+upload_choice = st.radio("Choose image input method:", ('Upload Image', 'Enter Image URL'))
 
-# Display the image and description, then infer personality and write Twitter bio
-if image_url:
+image_content = None
+
+if upload_choice == 'Upload Image':
+    uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+    if uploaded_image:
+        try:
+            image = Image.open(uploaded_image)
+            st.image(image, caption='Uploaded Image.', use_column_width=True)
+            image_content = uploaded_image.read()
+        except UnidentifiedImageError:
+            st.error("Error loading image: cannot identify image file.")
+elif upload_choice == 'Enter Image URL':
+    image_url = st.text_input('Enter Image URL')
+    if image_url:
+        try:
+            response = requests.get(image_url)
+            image = Image.open(BytesIO(response.content))
+            st.image(image, caption='Image from URL.', use_column_width=True)
+            image_content = BytesIO(response.content).getvalue()
+        except UnidentifiedImageError:
+            st.error("Error loading image: cannot identify image file.")
+        except requests.exceptions.RequestException as e:
+            st.error(f"Error fetching image from URL: {e}")
+
+# Process the image if one was provided
+if image_content:
     try:
-        response = requests.get(image_url)
-        image = Image.open(BytesIO(response.content))
-        st.image(image, caption='Uploaded Image.', use_column_width=True)
-        
-        image_content = BytesIO(response.content).getvalue()
         elements = get_image_description(google_api_key_json, image_content)
         st.write('Image Elements:', elements)
         
         bio = infer_personality_and_write_bio(openai_api_key, elements)
         st.write('Generated Twitter Bio:', bio)
-    except UnidentifiedImageError:
-        st.error("Error loading image: cannot identify image file.")
     except Exception as e:
         st.error(f"Error: {e}")
