@@ -7,8 +7,8 @@ from google.oauth2 import service_account
 import openai
 import json
 
-password = sl.text_input("Enter a password", type="password")
-if password != sl.secrets["password"]:
+password = st.text_input("Enter a password", type="password")
+if password != st.secrets["password"]:
     exit("it's all over")
 
 # Function to get Google Vision client
