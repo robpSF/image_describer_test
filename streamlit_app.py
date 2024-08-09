@@ -33,8 +33,6 @@ def infer_personality_and_write_bio(api_key, elements):
     prompt += "##RULES\n"
     prompt += "1. Don't use emojis\n"
     prompt += "2. Do NOT directly mention what's labelled, work from the personality\n\n"
-    prompt += "##Output from STEP 2\n"
-    prompt += '[""]'
     
     response = openai.ChatCompletion.create(
         model="gpt-4",
