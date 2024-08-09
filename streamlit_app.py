@@ -54,10 +54,10 @@ def infer_personality_and_write_bio(api_key, elements):
 # Function to generate OpenAI response for CSV Mode
 def generate_message_for_csv(api_key, elements):
     openai.api_key = api_key
-    prompt = f"The image contains the following elements: {elements}. Write a short message that could be used in a social media post."
+    prompt = f"The image contains the following elements: {elements}. Write a 20 word message that could be used in a social media post. Don't encapsule the output in quotes"
     
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
