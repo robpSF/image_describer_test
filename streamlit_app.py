@@ -4,8 +4,8 @@ import requests
 from io import BytesIO
 from google.cloud import vision
 from google.oauth2 import service_account
-import json
 import openai
+import json
 
 # Function to get Google Vision client
 def get_vision_client(api_key_json):
@@ -35,7 +35,7 @@ def infer_personality_and_write_bio(api_key, elements):
     prompt += '[""]'
     
     response = openai.ChatCompletion.create(
-        model="gpt-4o",
+        model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
@@ -46,27 +46,24 @@ def infer_personality_and_write_bio(api_key, elements):
 
 # Streamlit app
 st.title('Image Analysis and Twitter Bio Generation')
-st.write('Upload your Google Cloud Vision API key (JSON), your OpenAI API key, and the URL of an image to analyze and generate a Twitter bio.')
+st.write('Upload the URL of an image to analyze and generate a Twitter bio.')
 
-# Input field for Google Cloud Vision API key JSON file
-uploaded_file = st.file_uploader("Upload JSON key file for Google Cloud Vision", type="json")
-
-# Input field for OpenAI API key
-openai_api_key = st.text_input('Enter your OpenAI API Key', type='password')
+# Retrieve secrets from Streamlit
+google_api_key_json = json.loads(st.secrets["google_cloud"]["json_key"])
+openai_api_key = st.secrets["openai"]["api_key"]
 
 # Input field for image URL
 image_url = st.text_input('Enter Image URL')
 
 # Display the image and description, then infer personality and write Twitter bio
-if uploaded_file and openai_api_key and image_url:
+if image_url:
     try:
-        api_key_json = json.load(uploaded_file)
         response = requests.get(image_url)
         image = Image.open(BytesIO(response.content))
         st.image(image, caption='Uploaded Image.', use_column_width=True)
         
         image_content = BytesIO(response.content).getvalue()
-        elements = get_image_description(api_key_json, image_content)
+        elements = get_image_description(google_api_key_json, image_content)
         st.write('Image Elements:', elements)
         
         bio = infer_personality_and_write_bio(openai_api_key, elements)
@@ -75,4 +72,3 @@ if uploaded_file and openai_api_key and image_url:
         st.error("Error loading image: cannot identify image file.")
     except Exception as e:
         st.error(f"Error: {e}")
-
