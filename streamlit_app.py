@@ -50,7 +50,7 @@ st.write('Upload the URL of an image to analyze and generate a Twitter bio.')
 
 # Retrieve secrets from Streamlit
 google_api_key_json = json.loads(st.secrets["json_key"])
-st.write("Raw JSON string from secrets:", google_api_key_json_str)
+st.write("Raw JSON string from secrets:", google_api_key_json)
 openai_api_key = st.secrets["api_key"]
 
 # Input field for image URL
